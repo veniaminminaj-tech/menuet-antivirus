@@ -1,0 +1,30 @@
+name: Compile Menuet64 Assembly (nedohackos)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Запуск компілятора FASM з новою назвою вихідного файлу nedohackos
+    - name: Run FASM Compiler
+      uses: addnab/docker-run-action@v3
+      with:
+        image: ghcr.io/jessestuart/fasm:latest
+        options: -v ${{ github.workspace }}/:/data
+        run: |
+          cd /data/main
+          fasm avtest64.asm nedohackos
+
+    # Завантаження готового бінарника під назвою nedohackos-antivirus
+    - name: Upload Menuet64 Binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: nedohackos-antivirus
+        path: main/nedohackos
