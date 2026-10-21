@@ -1,0 +1,31 @@
+name: Build AVTEST64
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install FASM
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fasm
+          fasm 2>&1 | head -n 3 || true
+
+      - name: Assemble
+        working-directory: main
+        run: |
+          set -e
+          fasm avtest64.asm AVTEST64
+          ls -l AVTEST64
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: AVTEST64
+          path: main/AVTEST64
+          if-no-files-found: error
